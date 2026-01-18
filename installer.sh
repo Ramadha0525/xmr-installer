@@ -1,395 +1,393 @@
-#!/bin/bash
+#!/data/data/com.termux/files/usr/bin/bash
 
-# ============================================
-# XMRig Installer Script - Enhanced Edition
-# Author: Zhii-Sham
-# Instagram: zhii.sham
-# ============================================
+# ==============================================
+# UBUNTU-IN-TERMUX INSTALLER - ENHANCED VERSION
+# ==============================================
 
-# Colors
-RED='\033[0;31m'
-GREEN='\033[0;32m'
+# Warna untuk output
+RED='\033[1;31m'
+GREEN='\033[1;32m'
 YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-PURPLE='\033[0;35m'
-CYAN='\033[0;36m'
+BLUE='\033[1;34m'
+MAGENTA='\033[1;35m'
+CYAN='\033[1;36m'
 WHITE='\033[1;37m'
-NC='\033[0m' # No Color
+ORANGE='\033[1;38;5;214m'
+PURPLE='\033[1;38;5;129m'
+RESET='\033[0m'
 
-# Banner
-print_banner() {
+# Simbol untuk tampilan
+CHECK_MARK="✓"
+CROSS_MARK="✗"
+ARROW="➜"
+STAR="✦"
+DOT="●"
+LINE="─"
+BOX_TOP="╭"
+BOX_MID="├"
+BOX_BOT="╰"
+BOX_CORNER="╰"
+
+# Animasi loading
+spinner() {
+    local pid=$1
+    local delay=0.1
+    local spinstr='|/-\'
+    while [ "$(ps a | awk '{print $1}' | grep $pid)" ]; do
+        local temp=${spinstr#?}
+        printf " [%c]  " "$spinstr"
+        local spinstr=$temp${spinstr%"$temp"}
+        sleep $delay
+        printf "\b\b\b\b\b\b"
+    done
+    printf "    \b\b\b\b"
+}
+
+# Fungsi untuk header
+print_header() {
     clear
-    echo -e "${CYAN}"
+    echo -e "${PURPLE}"
     echo "╔══════════════════════════════════════════════════════════╗"
     echo "║                                                          ║"
-    echo "║  ██╗  ██╗███╗   ███╗██████╗ ██╗ ██████╗                  ║"
-    echo "║  ╚██╗██╔╝████╗ ████║██╔══██╗██║██╔════╝                  ║"
-    echo "║   ╚███╔╝ ██╔████╔██║██████╔╝██║██║                       ║"
-    echo "║   ██╔██╗ ██║╚██╔╝██║██╔══██╗██║██║                       ║"
-    echo "║  ██╔╝ ██╗██║ ╚═╝ ██║██║  ██║██║╚██████╗                  ║"
-    echo "║  ╚═╝  ╚═╝╚═╝     ╚═╝╚═╝  ╚═╝╚═╝ ╚═════╝                  ║"
+    echo "║      ██╗   ██╗██████╗ ██╗   ██╗███╗   ██╗████████╗██╗   ║"
+    echo "║      ██║   ██║██╔══██╗██║   ██║████╗  ██║╚══██╔══╝██║   ║"
+    echo "║      ██║   ██║██████╔╝██║   ██║██╔██╗ ██║   ██║   ██║   ║"
+    echo "║      ██║   ██║██╔══██╗██║   ██║██║╚██╗██║   ██║   ██║   ║"
+    echo "║      ╚██████╔╝██║  ██║╚██████╔╝██║ ╚████║   ██║   ██║   ║"
+    echo "║       ╚═════╝ ╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═══╝   ╚═╝   ╚═╝   ║"
     echo "║                                                          ║"
-    echo "║           🚀 XMRig Auto Installer v2.0 🚀               ║"
-    echo "║           Author: Zhii-Sham | zhii.sham                 ║"
+    echo "║                I N - T E R M U X                         ║"
     echo "║                                                          ║"
     echo "╚══════════════════════════════════════════════════════════╝"
-    echo -e "${NC}"
+    echo -e "${RESET}"
+    echo -e "${CYAN}╭${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}╮${RESET}"
+    echo -e "${CYAN}│ ${WHITE}Version: ${GREEN}24.10 ${WHITE}| ${WHITE}Architecture: ${GREEN}$(dpkg --print-architecture) ${WHITE}| ${WHITE}Status:${RESET}"
+    echo -e "${CYAN}╰${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}╯${RESET}"
+    echo ""
 }
 
-# Print functions
-print_msg() {
-    echo -e "${GREEN}[✓]${NC} $1"
-}
-
-print_warn() {
-    echo -e "${YELLOW}[!]${NC} $1"
-}
-
-print_err() {
-    echo -e "${RED}[✗]${NC} $1"
-}
-
+# Fungsi untuk pesan informasi
 print_info() {
-    echo -e "${CYAN}[i]${NC} $1"
+    echo -e "${CYAN}${ARROW} ${WHITE}$1${RESET}"
 }
 
-# Progress bar
+# Fungsi untuk pesan sukses
+print_success() {
+    echo -e "${GREEN}${CHECK_MARK} ${WHITE}$1${RESET}"
+}
+
+# Fungsi untuk pesan error
+print_error() {
+    echo -e "${RED}${CROSS_MARK} ${WHITE}$1${RESET}"
+}
+
+# Fungsi untuk pesan peringatan
+print_warning() {
+    echo -e "${YELLOW}${STAR} ${WHITE}$1${RESET}"
+}
+
+# Fungsi untuk pesan proses
+print_process() {
+    echo -e "${BLUE}${DOT} ${WHITE}$1${RESET}"
+}
+
+# Fungsi untuk progress bar
 progress_bar() {
-    local duration=${1:-2}
-    local bar=""
-    for ((i=0; i<50; i++)); do
-        bar+="█"
-        echo -ne "${CYAN}[$bar${NC}${CYAN}]${NC}\r"
-        sleep $(echo "scale=3; $duration/50" | bc)
-    done
-    echo ""
-}
-
-# Check system
-check_system() {
-    print_info "Checking system..."
+    local duration=$1
+    local width=50
+    local increment=$((100/$width))
+    local count=0
+    printf "\n${CYAN}["
     
-    if [[ -d "/data/data/com.termux" ]]; then
-        print_warn "Termux detected!"
-        echo ""
-        echo "Select option:"
-        echo "1. Install Ubuntu on Termux"
-        echo "2. Install directly on Termux"
-        echo "3. Exit"
-        echo ""
-        read -p "Choice [1-3]: " choice
-        
-        case $choice in
-            1)
-                install_termux_ubuntu
-                ;;
-            2)
-                print_warn "Direct installation on Termux may have issues"
-                read -p "Continue? (y/n): " -n 1 -r
-                echo
-                if [[ $REPLY =~ ^[Yy]$ ]]; then
-                    return 0
-                else
-                    exit 0
-                fi
-                ;;
-            3)
-                exit 0
-                ;;
-            *)
-                print_err "Invalid choice!"
-                exit 1
-                ;;
-        esac
-    else
-        print_msg "Linux system detected"
-        return 0
-    fi
-}
-
-# Install Ubuntu on Termux
-install_termux_ubuntu() {
-    print_info "Installing Ubuntu on Termux..."
-    
-    pkg update -y && pkg upgrade -y
-    pkg install wget proot-distro -y
-    proot-distro install ubuntu
-    
-    print_msg "Ubuntu installed!"
-    echo ""
-    echo "To continue:"
-    echo "1. Run: proot-distro login ubuntu"
-    echo "2. Download script again inside Ubuntu"
-    echo "3. Run: ./install-xmrig.sh"
-    echo ""
-    exit 0
-}
-
-# Install dependencies
-install_deps() {
-    print_info "Installing dependencies..."
-    
-    sudo apt-get update -y
-    progress_bar 2
-    
-    local deps=("git" "build-essential" "cmake" "libuv1-dev" "libssl-dev" "libhwloc-dev")
-    
-    for dep in "${deps[@]}"; do
-        echo -ne "Installing $dep... "
-        sudo apt-get install -y $dep > /dev/null 2>&1
-        if [ $? -eq 0 ]; then
-            echo -e "${GREEN}✓${NC}"
-        else
-            echo -e "${RED}✗${NC}"
-        fi
+    while [ $count -lt 100 ]; do
+        printf "▓"
+        count=$((count + increment))
+        sleep $(echo "scale=4; $duration/$width" | bc)
     done
     
-    print_msg "Dependencies installed"
+    printf "]${RESET}"
+    echo ""
 }
 
-# Build XMRig
-build_xmrig() {
-    print_info "Building XMRig..."
+# Fungsi utama install
+install_ubuntu() {
+    print_header
     
-    # Clone
-    if [ ! -d "xmrig" ]; then
-        git clone https://github.com/xmrig/xmrig.git
-        progress_bar 3
+    directory="ubuntu-fs"
+    UBUNTU_VERSION='24.10'
+    time1="$(date +"%H:%M:%S")"
+    
+    # Cek jika direktori sudah ada
+    if [ -d "$directory" ]; then
+        print_warning "Ubuntu directory already exists!"
+        print_info "Skipping download and extraction..."
+        echo ""
+        first=1
     else
-        print_warn "XMRig directory exists, updating..."
-        cd xmrig
-        git pull
-        cd ..
+        first=0
     fi
     
-    # Build
-    mkdir -p xmrig/build
-    cd xmrig/build
+    # Cek dependensi
+    print_process "Checking system requirements..."
+    echo -e "${CYAN}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${RESET}"
     
-    print_info "Configuring..."
-    cmake .. -DCMAKE_BUILD_TYPE=Release
-    progress_bar 2
-    
-    print_info "Compiling..."
-    make -j$(nproc)
-    progress_bar 5
-    
-    if [ -f "xmrig" ]; then
-        print_msg "XMRig built successfully!"
-        cd ../..
-    else
-        print_err "Build failed!"
+    # Cek proot
+    if [ -z "$(command -v proot)" ]; then
+        print_error "PROOT is not installed!"
+        print_info "Please install proot with: pkg install proot"
         exit 1
+    else
+        print_success "PROOT is installed"
     fi
-}
-
-# Create config
-create_config() {
-    print_info "Creating configuration..."
     
-    echo ""
-    echo "=== Pool Selection ==="
-    echo "1. SupportXMR (pool.supportxmr.com:5555)"
-    echo "2. MineXMR (minexmr.com:4444)"
-    echo "3. Nanopool (xmr-eu1.nanopool.org:14444)"
-    echo "4. Kryptex (xmr.kryptex.network:7029)"
-    echo "5. Custom"
-    echo ""
-    read -p "Select pool [1-5]: " pool_choice
+    # Cek wget
+    if [ -z "$(command -v wget)" ]; then
+        print_error "WGET is not installed!"
+        print_info "Please install wget with: pkg install wget"
+        exit 1
+    else
+        print_success "WGET is installed"
+    fi
     
-    case $pool_choice in
-        1) POOL="pool.supportxmr.com:5555" ;;
-        2) POOL="minexmr.com:4444" ;;
-        3) POOL="xmr-eu1.nanopool.org:14444" ;;
-        4) POOL="xmr.kryptex.network:7029" ;;
-        5)
-            read -p "Enter pool (host:port): " POOL
-            ;;
+    # Cek arsitektur
+    ARCHITECTURE=$(dpkg --print-architecture)
+    case "$ARCHITECTURE" in
+        aarch64) ARCH="arm64" ;;
+        arm) ARCH="armhf" ;;
+        amd64|x86_64) ARCH="amd64" ;;
         *)
-            POOL="pool.supportxmr.com:5555"
+            print_error "Unsupported architecture: $ARCHITECTURE"
+            exit 1
             ;;
     esac
+    print_success "Architecture detected: $ARCH"
     
     echo ""
-    read -p "Enter wallet address: " WALLET
-    read -p "Enter worker name [worker]: " WORKER
-    WORKER=${WORKER:-"worker"}
     
-    CORES=$(nproc)
-    echo ""
-    echo "=== Thread Configuration ==="
-    echo "Detected CPU cores: $CORES"
-    echo "1. Use all cores ($CORES threads)"
-    echo "2. Use half cores ($((CORES/2)) threads)"
-    echo "3. Custom"
-    echo "4. Auto (let XMRig decide)"
-    echo ""
-    read -p "Select [1-4]: " thread_choice
-    
-    case $thread_choice in
-        1) THREADS=$CORES ;;
-        2) THREADS=$((CORES/2)) ;;
-        3)
-            read -p "Enter threads [1-$CORES]: " THREADS
-            if [[ $THREADS -lt 1 || $THREADS -gt $CORES ]]; then
-                THREADS=$CORES
-            fi
-            ;;
-        *) THREADS="auto" ;;
-    esac
-    
-    # Create xmr.sh
-    cat > xmr.sh << EOF
-#!/bin/bash
-# XMRig Mining Script
-
-WALLET="$WALLET"
-POOL="$POOL"
-WORKER="$WORKER"
-THREADS="$THREADS"
-
-echo "========================================"
-echo "Starting XMRig Miner"
-echo "========================================"
-echo "Pool: \$POOL"
-echo "Wallet: \$WALLET"
-echo "Worker: \$WORKER"
-echo "Threads: \$THREADS"
-echo "========================================"
-
-cd xmrig/build
-
-./xmrig \\
-    --randomx-mode=fast \\
-    --threads=\$THREADS \\
-    --cpu-max-threads-hint=100 \\
-    -o \$POOL \\
-    -u \$WALLET \\
-    -p \$WORKER \\
-    --donate-level=1
-EOF
-    
-    chmod +x xmr.sh
-    
-    # Create config.txt
-    cat > config.txt << EOF
-# XMRig Configuration
-WALLET="$WALLET"
-POOL="$POOL"
-WORKER="$WORKER"
-THREADS="$THREADS"
-EOF
-    
-    # Create helper scripts
-    create_helper_scripts
-    
-    print_msg "Configuration created!"
-}
-
-# Create helper scripts
-create_helper_scripts() {
-    # start.sh
-    cat > start.sh << 'EOF'
-#!/bin/bash
-echo "Starting XMRig miner..."
-echo "To view output: screen -r xmrig"
-echo "To detach: Ctrl+A then D"
-echo ""
-screen -dmS xmrig ./xmr.sh
-echo "Miner started in screen session 'xmrig'"
-EOF
-    
-    # stop.sh
-    cat > stop.sh << 'EOF'
-#!/bin/bash
-echo "Stopping XMRig miner..."
-screen -S xmrig -X quit 2>/dev/null
-pkill -f xmrig 2>/dev/null
-echo "Miner stopped"
-EOF
-    
-    # status.sh
-    cat > status.sh << 'EOF'
-#!/bin/bash
-echo "=== Mining Status ==="
-if screen -list | grep -q "xmrig"; then
-    echo "Status: RUNNING"
-    echo "Session: xmrig"
-    echo "To view: screen -r xmrig"
-else
-    echo "Status: STOPPED"
-fi
-echo "===================="
-EOF
-    
-    # update_config.sh
-    cat > update_config.sh << 'EOF'
-#!/bin/bash
-echo "Updating configuration..."
-if [ -f "config.txt" ]; then
-    source config.txt
-    echo "Current config:"
-    echo "Wallet: $WALLET"
-    echo "Pool: $POOL"
-    echo "Worker: $WORKER"
-    echo ""
-    read -p "Update? (y/n): " choice
-    if [[ $choice == "y" ]]; then
-        ./install-xmrig.sh --config-only
+    # Jika belum ada, download dan ekstrak
+    if [ "$first" != 1 ]; then
+        print_process "Starting Ubuntu installation..."
+        echo ""
+        
+        # Download rootfs
+        if [ ! -f "ubuntu.tar.gz" ]; then
+            print_process "Downloading Ubuntu ${UBUNTU_VERSION} rootfs for ${ARCH}..."
+            print_info "This may take a few minutes depending on your connection"
+            echo ""
+            
+            # Download dengan progress bar
+            wget --show-progress -q --progress=bar:force \
+                 "https://cdimage.ubuntu.com/ubuntu-base/releases/${UBUNTU_VERSION}/release/ubuntu-base-${UBUNTU_VERSION}-base-${ARCH}.tar.gz" \
+                 -O ubuntu.tar.gz &
+            wget_pid=$!
+            
+            # Tampilkan spinner selama download
+            spinner $wget_pid
+            wait $wget_pid
+            
+            echo ""
+            print_success "Download completed successfully!"
+            echo ""
+        else
+            print_warning "Ubuntu rootfs already downloaded"
+        fi
+        
+        # Ekstraksi
+        print_process "Extracting Ubuntu rootfs..."
+        mkdir -p $directory
+        cur=$(pwd)
+        cd $directory
+        
+        # Simulasikan progress bar untuk ekstraksi
+        print_info "Extracting files, please wait..."
+        (proot --link2symlink tar -zxf $cur/ubuntu.tar.gz --exclude='dev' 2>/dev/null) &
+        extract_pid=$!
+        spinner $extract_pid
+        wait $extract_pid
+        
+        print_success "Extraction completed!"
+        echo ""
+        
+        # Konfigurasi
+        print_process "Configuring Ubuntu environment..."
+        
+        # Fix resolv.conf
+        print_info "Configuring DNS..."
+        printf "nameserver 8.8.8.8\nnameserver 8.8.4.4\n" > etc/resolv.conf
+        print_success "DNS configured"
+        
+        # Write stubs
+        print_info "Setting up system stubs..."
+        stubs=('usr/bin/groups')
+        for f in ${stubs[@]}; do
+            echo -e "#!/bin/sh\nexit" > "$f"
+            chmod +x "$f"
+        done
+        print_success "System stubs created"
+        
+        cd $cur
+        echo ""
     fi
-else
-    echo "Config file not found!"
-fi
-EOF
     
-    chmod +x start.sh stop.sh status.sh update_config.sh
+    # Buat direktori binds
+    print_process "Creating bind directories..."
+    mkdir -p ubuntu-binds
+    print_success "Bind directories created"
+    echo ""
+    
+    # Buat start script
+    print_process "Creating startup script..."
+    bin="start-ubuntu.sh"
+    
+    cat > $bin <<- EOM
+#!/bin/bash
+
+# ==========================================
+# UBUNTU IN TERMUX - START SCRIPT
+# ==========================================
+
+echo -e "\033[1;36m"
+echo "╔══════════════════════════════════════════════════════════╗"
+echo "║                   Starting Ubuntu...                     ║"
+echo "╚══════════════════════════════════════════════════════════╝"
+echo -e "\033[0m"
+
+cd \$(dirname \$0)
+unset LD_PRELOAD
+
+command="proot"
+command+=" --link2symlink"
+command+=" -0"
+command+=" -r $directory"
+
+# Bind directories
+command+=" -b /dev"
+command+=" -b /proc"
+command+=" -b /sys"
+command+=" -b ubuntu-fs/tmp:/dev/shm"
+command+=" -b /data/data/com.termux"
+command+=" -b /:/host-rootfs"
+command+=" -b /sdcard"
+command+=" -b /storage"
+command+=" -b /mnt"
+command+=" -w /root"
+
+# Environment variables
+command+=" /usr/bin/env -i"
+command+=" HOME=/root"
+command+=" PATH=/usr/local/sbin:/usr/local/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/games:/usr/local/games"
+command+=" TERM=\$TERM"
+command+=" LANG=C.UTF-8"
+command+=" /bin/bash --login"
+
+com="\$@"
+
+echo -e "\033[1;33m[\033[1;36m*\033[1;33m] Preparing Ubuntu environment...\033[0m"
+sleep 1
+
+if [ -z "\$1" ]; then
+    echo -e "\033[1;32m[\033[1;36m✓\033[1;32m] Ubuntu is ready! Type 'exit' to return to Termux\033[0m"
+    echo ""
+    exec \$command
+else
+    \$command -c "\$com"
+fi
+EOM
+    
+    # Fix shebang dan permissions
+    termux-fix-shebang $bin 2>/dev/null
+    chmod +x $bin
+    
+    print_success "Startup script created: ./$bin"
+    echo ""
+    
+    # Cleanup
+    print_process "Cleaning up temporary files..."
+    if [ -f "ubuntu.tar.gz" ]; then
+        rm -f ubuntu.tar.gz
+        print_success "Temporary files cleaned"
+    fi
+    echo ""
+    
+    # Tampilkan informasi akhir
+    print_header
+    echo -e "${GREEN}╔══════════════════════════════════════════════════════════╗${RESET}"
+    echo -e "${GREEN}║           INSTALLATION COMPLETED SUCCESSFULLY!          ║${RESET}"
+    echo -e "${GREEN}╚══════════════════════════════════════════════════════════╝${RESET}"
+    echo ""
+    print_success "Ubuntu ${UBUNTU_VERSION} has been installed!"
+    echo ""
+    print_info "Available commands:"
+    echo -e "  ${CYAN}./start-ubuntu.sh${WHITE}        - Start Ubuntu"
+    echo -e "  ${CYAN}./start-ubuntu.sh <command>${WHITE} - Run command in Ubuntu"
+    echo ""
+    print_info "Quick start:"
+    echo -e "  ${GREEN}1. ${WHITE}Run ${CYAN}./start-ubuntu.sh${WHITE}"
+    echo -e "  ${GREEN}2. ${WHITE}Update packages: ${CYAN}apt update && apt upgrade${WHITE}"
+    echo -e "  ${GREEN}3. ${WHITE}Install packages: ${CYAN}apt install <package-name>${WHITE}"
+    echo ""
+    print_warning "Note: Use 'exit' to return to Termux"
+    echo ""
+    echo -e "${PURPLE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${RESET}"
+    echo ""
 }
 
-# Show instructions
-show_instructions() {
+# Fungsi untuk tampilan awal
+show_welcome() {
+    print_header
+    echo -e "${GREEN}Welcome to Ubuntu-in-Termux Installer!${RESET}"
     echo ""
-    echo -e "${CYAN}╔══════════════════════════════════════════════════════════╗${NC}"
-    echo -e "${CYAN}║               INSTALLATION COMPLETE!                    ║${NC}"
-    echo -e "${CYAN}╚══════════════════════════════════════════════════════════╝${NC}"
+    print_info "This script will install Ubuntu ${UBUNTU_VERSION} in Termux"
     echo ""
-    echo -e "${GREEN}Available commands:${NC}"
-    echo "  ./start.sh     - Start mining"
-    echo "  ./stop.sh      - Stop mining"
-    echo "  ./status.sh    - Check status"
-    echo "  ./xmr.sh       - Run miner directly"
-    echo "  ./update_config.sh - Update configuration"
+    print_warning "Requirements:"
+    echo -e "  ${WHITE}• ${CYAN}Internet connection${RESET}"
+    echo -e "  ${WHITE}• ${CYAN}At least 500MB free storage${RESET}"
+    echo -e "  ${WHITE}• ${CYAN}Proot and Wget installed${RESET}"
     echo ""
-    echo -e "${YELLOW}How to start mining:${NC}"
-    echo "  1. Edit config.txt if needed"
-    echo "  2. Run: ./start.sh"
-    echo "  3. View output: screen -r xmrig"
+    print_info "Installation includes:"
+    echo -e "  ${WHITE}• ${GREEN}Ubuntu base system${RESET}"
+    echo -e "  ${WHITE}• ${GREEN}Basic configuration${RESET}"
+    echo -e "  ${WHITE}• ${GREEN}Network setup${RESET}"
+    echo -e "  ${WHITE}• ${GREEN}Startup script${RESET}"
     echo ""
-    echo -e "${CYAN}Author: Zhii-Sham${NC}"
-    echo -e "${CYAN}Instagram: zhii.sham${NC}"
+    echo -e "${YELLOW}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${LINE}${RESET}"
     echo ""
 }
 
-# Main function
+# Main script logic
 main() {
-    print_banner
-    
-    # Check if config-only mode
-    if [[ "$1" == "--config-only" ]]; then
-        create_config
+    if [ "$1" = "-y" ] || [ "$1" = "--yes" ]; then
+        install_ubuntu
+    elif [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+        print_header
+        echo -e "${CYAN}Usage:${RESET}"
+        echo -e "  ${WHITE}./ubuntu.sh${RESET}           - Interactive installation"
+        echo -e "  ${WHITE}./ubuntu.sh -y${RESET}        - Automatic installation"
+        echo -e "  ${WHITE}./ubuntu.sh --help${RESET}    - Show this help"
+        echo ""
         exit 0
-    fi
-    
-    # Check system
-    if ! check_system; then
+    elif [ "$1" = "" ]; then
+        show_welcome
+        
+        echo -ne "${YELLOW}Do you want to continue with installation? [Y/n]: ${RESET}"
+        read -n 1 -r response
+        echo ""
+        
+        if [[ $response =~ ^[Yy]$ ]] || [[ -z $response ]]; then
+            echo ""
+            install_ubuntu
+        else
+            echo ""
+            print_error "Installation cancelled by user"
+            echo ""
+            exit 0
+        fi
+    else
+        print_error "Invalid option: $1"
+        print_info "Use --help for usage information"
         exit 1
     fi
-    
-    # Install
-    install_deps
-    build_xmrig
-    create_config
-    show_instructions
 }
 
-# Run main
+# Jalankan main function
 main "$@"
