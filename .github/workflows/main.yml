@@ -1,0 +1,26 @@
+name: Eksekusi Skrip SH
+
+# Trigger: Workflow akan berjalan saat ada push ke branch 'main' 
+# atau bisa dijalankan secara manual (workflow_dispatch)
+on:
+  push:
+    branches:
+      - main 
+  workflow_dispatch: 
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest # Menggunakan server virtual Ubuntu terbaru
+
+    steps:
+      # Langkah 1: Mengambil salinan kode dari repository
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Langkah 2: Memberikan izin eksekusi pada file script
+      - name: Berikan hak akses eksekusi
+        run: chmod +x ./xmr.sh 
+
+      # Langkah 3: Menjalankan file script
+      - name: Jalankan script
+        run: ./xmr.sh
