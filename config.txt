@@ -1,0 +1,5 @@
+# XMRig Configuration
+WALLET="krxXG66PZ4"
+POOL="pool.supportxmr.com:5555"
+WORKER="workergit"
+THREADS="auto"
